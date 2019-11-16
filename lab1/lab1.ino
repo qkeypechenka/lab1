@@ -31,7 +31,8 @@ void show() {
   while (1) {
     unsigned long timePassed = millis() - startTime;
     if (timePassed % 5000 == 0) {
-      makeBlink(); 
+      makeBlink();
+      updateColor(RED);
     }
     if (timePassed > 30000) {
       updateColor(BLUE);
