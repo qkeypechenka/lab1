@@ -1,66 +1,61 @@
 #include <Arduino.h>
-#include <MD_TCS230.h>
+#include "button.h"
 
-#define  S0_OUT  2
-#define  S1_OUT  3
-#define  S2_OUT  4
-#define  S3_OUT  5
 
 #define R_OUT 6
-#define G_OUT 7
+#define G_OUT 7 
 #define B_OUT 8
 
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+#define PIN_BUTTON 5
 
-void setup()
-{
-    Serial.begin(115200);
-    Serial.println("Started!");
+#define RED "red"
+#define BLUE "blue"
+#define GREEN "green"
+Button button = Button(PIN_BUTTON);
 
-    sensorData whiteCalibration;
-    whiteCalibration.value[TCS230_RGB_R] = 0;
-    whiteCalibration.value[TCS230_RGB_G] = 0;
-    whiteCalibration.value[TCS230_RGB_B] = 0;
-
-    sensorData blackCalibration;
-    blackCalibration.value[TCS230_RGB_R] = 0;
-    blackCalibration.value[TCS230_RGB_G] = 0;
-    blackCalibration.value[TCS230_RGB_B] = 0;
-
-    colorSensor.begin();
-    colorSensor.setDarkCal(&blackCalibration);
-    colorSensor.setWhiteCal(&whiteCalibration);
-
+void setup() {
     pinMode(R_OUT, OUTPUT);
     pinMode(G_OUT, OUTPUT);
     pinMode(B_OUT, OUTPUT);
 }
 
-void loop() 
-{
-    colorData rgb;
-    colorSensor.read();
-
-    while (!colorSensor.available());
-
-    colorSensor.getRGB(&rgb);
-    print_rgb(rgb);
-    set_rgb_led(rgb);
+void loop() {
+    if (button.wasPressed()) {   
+        main();
+    }
 }
 
-void print_rgb(colorData rgb)
-{
-  Serial.print(rgb.value[TCS230_RGB_R]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_G]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_B]);
-  Serial.println();
+void main() {
+  updateColor(RED);
+  unsigned long startTime = millis();
+  while (1) {
+    unsigned long timePassed = millis() - startTime;
+    if (timePassed % 5000 == 0) {
+      makeBlink(); 
+    }
+    if (timePassed > 30000) {
+      updateColor(BLUE);
+    }
+  }
 }
 
-void set_rgb_led(colorData rgb)
-{
-    analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
-    analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
-    analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
+void updateColor(String color) {
+  if (color == RED) {
+    set_rgb_led(255, 0, 0);
+  } else if (color == GREEN) {
+    set_rgb_led(0, 255, 0);
+  } else if (color == BLUE) {
+    set_rgb_led(0, 0, 255);
+  }
+}
+
+void makeBlink() {
+  set_rgb_led(255, 255, 255);
+  delay(500);
+}
+
+void set_rgb_led(int r, int g, int b) {
+      analogWrite(R_OUT, 255 - r);
+      analogWrite(G_OUT, 255 - g);
+      analogWrite(B_OUT, 255 - b);
 }
