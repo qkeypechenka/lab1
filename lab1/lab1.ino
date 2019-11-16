@@ -41,20 +41,23 @@ void show() {
     unsigned long timePassed = millis() - startTime;
     if (timePassed % 5000 == 0) {
       state = Blink;
-      makeBlink();
     }
     
     switch (state) {
       case Blink:
-        if (timePassed % 500 == 0) {
+        if (timePassed % 5000 == 0) {
+          makeBlink();
+        } else if (timePassed % 500 == 0) {
           state = ShowColor;
         }
+        break;
       case ShowColor:
         if (timePassed <= 30000) {
           updateColor(RED);
         } else {
           updateColor(BLUE);
         }
+        break;
     }
   }
 }
@@ -75,7 +78,6 @@ void updateColor(Color color) {
 
 void makeBlink() {
   set_rgb_led(255, 255, 255);
-  delay(500);
 }
 
 void set_rgb_led(int r, int g, int b) {
