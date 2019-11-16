@@ -21,11 +21,11 @@ void setup() {
 
 void loop() {
     if (button.wasPressed()) {   
-        main();
+        show();
     }
 }
 
-void main() {
+void show() {
   updateColor(RED);
   unsigned long startTime = millis();
   while (1) {
