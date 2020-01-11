@@ -15,8 +15,10 @@ enum Color {
 };
 
 enum State {
+  StartBlink,
   Blink,
-  ShowColor
+  ShowColor,
+  ShowingColor
 };
 
 Button button = Button(PIN_BUTTON);
@@ -39,23 +41,29 @@ void show() {
   unsigned long startTime = millis();
   while (1) {
     unsigned long timePassed = millis() - startTime;
-    if (timePassed % 5000 == 0) {
+    if (timePassed % 5000 <= 3) {
+      state = StartBlink;
+    } else if (timePassed % 500 <= 3) {
       state = Blink;
     }
     
     switch (state) {
-      case Blink:
-        if (timePassed % 5000 == 0) {
-          makeBlink();
-        } else if (timePassed % 500 == 0) {
-          state = ShowColor;
-        }
+      case StartBlink:
+        makeBlink();
         break;
+        
+      case Blink:
+        state = ShowColor;
+        break;
+        
       case ShowColor:
+        updateColor(BLUE);
+        state = ShowingColor;
+        break;
+        
+      case ShowingColor:
         if (timePassed <= 30000) {
-          updateColor(RED);
-        } else {
-          updateColor(BLUE);
+            updateColor(RED);
         }
         break;
     }
